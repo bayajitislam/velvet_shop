@@ -8,4 +8,13 @@ class RoutesName {
   static const String wishlist = "/wishlist";
   static const String profile = "/profile";
   static const String productDetails = "/productDetails";
+  static const String orderSuccess = '/order-success';
+  static const String orders = '/orders';
+  static const String editProfile = '/edit-profile';
+  static const String addresses = '/addresses';
+  static const String payments = '/payments';
+  static const String notifications = '/notifications';
+  static const String help = '/help';
+  static const String privacy = '/privacy';
+  static const String about = '/about';
 }

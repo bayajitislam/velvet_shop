@@ -25,13 +25,15 @@ class HomeAppBar extends StatelessWidget {
               border: Border.all(color: AppPallete.primaryLight, width: 2),
             ),
             child: ClipOval(
-              child: Obx(() => c.isLoggedIn.value
-                  ? Image.network(
-                      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _guestIcon(),
-                    )
-                  : _guestIcon()),
+              child: Obx(
+                () => c.isLoggedIn
+                    ? Image.network(
+                        'https://bayajitislam.com/bayajitislam.jpeg',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => _guestIcon(),
+                      )
+                    : _guestIcon(),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -42,21 +44,22 @@ class HomeAppBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(AppStrings.homeGreeting,
-                    style: AppTextStyle.s12w4(color: AppPallete.subTextColor)),
+                Text(
+                  AppStrings.homeGreeting,
+                  style: AppTextStyle.s12w4(color: AppPallete.subTextColor),
+                ),
                 const SizedBox(height: 2),
-                Obx(() => c.isLoggedIn.value
-                    ? Text(c.userName.value, style: AppTextStyle.s16w6())
-                    : _SignInPill()),
+                Obx(
+                  () => c.isLoggedIn
+                      ? Text(c.userName, style: AppTextStyle.s16w6())
+                      : _SignInPill(),
+                ),
               ],
             ),
           ),
 
           // Notification
-          _AppBarIconBtn(
-            icon: Icons.notifications_none_rounded,
-            onTap: () {},
-          ),
+          _AppBarIconBtn(icon: Icons.notifications_none_rounded, onTap: () {}),
           const SizedBox(width: 10),
 
           // Cart
@@ -70,10 +73,9 @@ class HomeAppBar extends StatelessWidget {
   }
 
   Widget _guestIcon() => Container(
-        color: AppPallete.background,
-        child:
-            const Icon(Icons.person_outline, color: AppPallete.primary),
-      );
+    color: AppPallete.background,
+    child: const Icon(Icons.person_outline, color: AppPallete.primary),
+  );
 }
 
 class _SignInPill extends StatelessWidget {
@@ -87,8 +89,10 @@ class _SignInPill extends StatelessWidget {
           color: AppPallete.primary,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text('Sign In',
-            style: AppTextStyle.s12w5(color: AppPallete.white)),
+        child: Text(
+          'Sign In',
+          style: AppTextStyle.s12w5(color: AppPallete.white),
+        ),
       ),
     );
   }
@@ -110,15 +114,12 @@ class _AppBarIconBtn extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppPallete.surface,
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: AppPallete.dropShadow,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
-        child: Icon(icon, color: AppPallete.bodyText, size: 20),
+        child: Icon(
+          icon,
+          color: AppPallete.bodyText.withValues(alpha: 0.7),
+          size: 20,
+        ),
       ),
     );
   }

@@ -3,8 +3,20 @@ import 'package:get/get.dart';
 import 'package:velvet/core/constants/app_strings.dart';
 import 'package:velvet/core/theme/app_pallete.dart';
 import 'package:velvet/core/theme/app_text_style.dart';
+import 'package:velvet/core/utils/screen_size.dart';
 import 'package:velvet/features/home/controllers/home_controller.dart';
 import 'package:velvet/features/home/models/bennar_model.dart';
+
+// ─────────────────────────────────────────────────────────
+//  HomeBannerSlider
+//
+//  • Full-bleed background image (BoxFit.cover)
+//  • Left-side gradient overlay → text readable on any image
+//  • Title + subtitle + Shop Now button on left foreground
+//  • Fully responsive via ScreenSize extension (375px baseline)
+//  • Auto-play page controller (wire in HomeController)
+//  • Skeleton while loading
+// ─────────────────────────────────────────────────────────
 
 class HomeBannerSlider extends StatelessWidget {
   const HomeBannerSlider({super.key});
@@ -12,25 +24,34 @@ class HomeBannerSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Get.find<HomeController>();
+
+    // Responsive banner height — 48% of screen width keeps
+    // aspect ratio consistent across phone sizes
+    final bannerHeight = context.widthPercentage(48);
+
     return Obx(() {
       if (c.isBannerLoading.value) {
-        return const _BannerSkeleton();
+        return _BannerSkeleton(height: bannerHeight);
       }
+
       return Column(
         children: [
           SizedBox(
-            height: 185,
+            height: bannerHeight,
             child: PageView.builder(
               controller: c.bannerPageController,
               onPageChanged: c.onBannerPageChanged,
               itemCount: c.banners.length,
               itemBuilder: (_, i) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: context.spacing16),
                 child: _BannerCard(banner: c.banners[i]),
               ),
             ),
           ),
-          const SizedBox(height: 10),
+
+          SizedBox(height: context.spacing8),
+
+          // Dot indicators
           Obx(
             () => Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -57,69 +78,94 @@ class HomeBannerSlider extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────
+//  Banner Card — full bleed image + left gradient + text
+// ─────────────────────────────────────────────────────────
+
 class _BannerCard extends StatelessWidget {
   final BannerModel banner;
   const _BannerCard({required this.banner});
 
   @override
   Widget build(BuildContext context) {
+    // Responsive values
+    final titleSize = context.responsiveFontSize(18);
+    final subtitleSize = context.responsiveFontSize(11);
+    final btnFontSize = context.responsiveFontSize(11);
+    final hPad = context.spacing16;
+    final vPad = context.spacing16;
+
     return Container(
       decoration: BoxDecoration(
-        color: banner.bgColor,
-        borderRadius: BorderRadius.circular(20),
+        color: banner.bgColor, // fallback bg while image loads
+        borderRadius: BorderRadius.circular(context.responsiveSize(12)),
       ),
       clipBehavior: Clip.hardEdge,
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          // Decorative circle
+          // ── 1. Full-bleed background image ─────────────
+          Image.network(
+            banner.imageUrl,
+            fit: BoxFit.cover,
+            // Bias slightly to the right so subject stays visible
+            alignment: const Alignment(0.4, 0.0),
+            errorBuilder: (_, _, _) => Container(color: banner.bgColor),
+          ),
+
+          // ── 2. Decorative subtle circle (top-right) ─────
           Positioned(
-            right: -20,
-            top: -20,
+            right: -context.responsiveSize(24),
+            top: -context.responsiveSize(24),
             child: Container(
-              width: 140,
-              height: 140,
+              width: context.responsiveSize(110),
+              height: context.responsiveSize(110),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.06),
               ),
             ),
           ),
-          // Model image
+
+          // ── 3. Text + button (left foreground) ──────────
           Positioned(
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: SizedBox(
-              width: 155,
-              child: Image.network(
-                banner.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-              ),
-            ),
-          ),
-          // Text
-          Positioned(
-            left: 20,
-            top: 20,
-            bottom: 20,
-            right: 155,
+            left: hPad,
+            top: vPad,
+            bottom: vPad,
+            // Limit text area to ~55% width so it never overlaps face
+            right: context.widthPercentage(42),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Title
                 Text(
                   banner.title,
-                  style: AppTextStyle.s20w6(color: AppPallete.white),
+                  style: AppTextStyle.s20w6(
+                    color: AppPallete.white,
+                    fontSize: titleSize,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 6),
+
+                SizedBox(height: context.spacing8),
+
+                // Subtitle
                 Text(
                   banner.subtitle,
-                  style: AppTextStyle.s12w4(color: Colors.white70),
+                  style: AppTextStyle.s12w4(
+                    color: Colors.white.withValues(alpha: 0.80),
+                    fontSize: subtitleSize,
+                  ),
                   maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 14),
-                _ShopNowBtn(),
+
+                SizedBox(height: context.spacing16),
+
+                // Shop Now button
+                _ShopNowBtn(fontSize: btnFontSize),
               ],
             ),
           ),
@@ -129,43 +175,97 @@ class _BannerCard extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────
+//  Shop Now Button
+// ─────────────────────────────────────────────────────────
+
 class _ShopNowBtn extends StatelessWidget {
+  final double fontSize;
+  const _ShopNowBtn({required this.fontSize});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing16,
+        vertical: context.spacing8,
+      ),
       decoration: BoxDecoration(
         color: AppPallete.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(context.responsiveSize(20)),
       ),
       child: Text(
         AppStrings.homeBtnShopNow,
-        style: AppTextStyle.s12w5(color: AppPallete.primaryDark),
+        style: AppTextStyle.s12w5(color: AppPallete.black, fontSize: fontSize),
       ),
     );
   }
 }
 
-class _BannerSkeleton extends StatelessWidget {
-  const _BannerSkeleton();
+// ─────────────────────────────────────────────────────────
+//  Skeleton loader
+// ─────────────────────────────────────────────────────────
+
+class _BannerSkeleton extends StatefulWidget {
+  final double height;
+  const _BannerSkeleton({required this.height});
+
+  @override
+  State<_BannerSkeleton> createState() => _BannerSkeletonState();
+}
+
+class _BannerSkeletonState extends State<_BannerSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _shimmer;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+    _shimmer = Tween<double>(
+      begin: -1.5,
+      end: 1.5,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        height: 170,
-        decoration: BoxDecoration(
-          color: AppPallete.background,
-          borderRadius: BorderRadius.circular(20),
-        ),
+      padding: EdgeInsets.symmetric(horizontal: context.spacing16),
+      child: AnimatedBuilder(
+        animation: _shimmer,
+        builder: (_, _) {
+          return Container(
+            height: widget.height,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(context.responsiveSize(20)),
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                stops: [
+                  (_shimmer.value - 0.3).clamp(0.0, 1.0),
+                  (_shimmer.value).clamp(0.0, 1.0),
+                  (_shimmer.value + 0.3).clamp(0.0, 1.0),
+                ],
+                colors: [
+                  AppPallete.background,
+                  AppPallete.stroke,
+                  AppPallete.background,
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

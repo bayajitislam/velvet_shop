@@ -12,21 +12,21 @@ class HomeRepository {
         title: 'Discover Your Raw\nSignature Look',
         subtitle: 'Explore the latest fashion\ntrends curated just for you.',
         imageUrl:
-            'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600',
+            'https://i.pinimg.com/736x/e4/d8/b1/e4d8b149c25abcef1c4d43b2a94ebbb8.jpg',
         bgColor: Color(0xFFD81B60),
       ),
       const BannerModel(
         title: 'New Summer\nCollection 2025',
         subtitle: 'Fresh styles for the\nwarm season ahead.',
         imageUrl:
-            'https://images.unsplash.com/photo-1612215326956-c2bb6228c72d?w=600',
+            'https://img.magnific.com/free-photo/attractive-smiling-asian-woman-holding-shopping-bags-wearing-sunglasses-cute-dress-standing-agai_1258-153611.jpg?w=360',
         bgColor: Color(0xFFC2185B),
       ),
       const BannerModel(
         title: 'Up to 50% Off\nSelected Items',
         subtitle: 'Limited time offer on\npremium collections.',
         imageUrl:
-            'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600',
+            'https://static.vecteezy.com/system/resources/thumbnails/028/714/263/small/fashion-week-model-isolated-on-pastel-background-with-a-place-for-text-photo.jpg',
         bgColor: Color(0xFFAD1457),
       ),
     ];
@@ -47,16 +47,17 @@ class HomeRepository {
     return [
       ProductModel(
         id: '1',
-        name: 'Velvet Rider Jacket',
-        subtitle: 'Urban Style, Endless Motion',
+        name: 'Boho-Chic Fedora',
+        subtitle:
+            'Unveiling effortless indie style',
         price: 199.00,
         originalPrice: 249.00,
         imageUrl:
-            'https://plus.unsplash.com/premium_photo-1742916917924-00d56e4ca5d7',
+            'https://img.magnific.com/free-photo/studio-close-up-portrait-young-fresh-blonde-woman-brown-straw-poncho-wool-black-trendy-hat-round-glasses-looking-camera-green-leather-had-bag_273443-1121.jpg?semt=ais_hybrid&w=740&q=80',
         images: [
-          'https://plus.unsplash.com/premium_photo-1742916917924-00d56e4ca5d7',
-          'https://plus.unsplash.com/premium_photo-1667520043080-53dcca77e2aa',
-          'https://plus.unsplash.com/premium_photo-1682095763838-0ca2593193bd',
+          'https://img.magnific.com/free-photo/studio-close-up-portrait-young-fresh-blonde-woman-brown-straw-poncho-wool-black-trendy-hat-round-glasses-looking-camera-green-leather-had-bag_273443-1121.jpg?semt=ais_hybrid&w=740&q=80',
+          'https://img.magnific.com/free-photo/outdoor-hight-fashion-portrait-stylish-casual-woman-black-hat-pink-suit-white-blouse-posing-old-street_273443-1186.jpg?t=st=1779596969~exp=1779600569~hmac=4754d87d627983a3f31d7ba026f2b131d520d6f7d4baf6705556519c60486ca4&w=740',
+          'https://img.magnific.com/free-photo/fashionable-woman-pink-coat-black-hat-posing_273443-2429.jpg',
         ],
         rating: 4.8,
         reviewCount: 340,

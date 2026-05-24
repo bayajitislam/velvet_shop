@@ -1,33 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:velvet/features/auth/repositories/auth_repository.dart';
+import 'package:velvet/features/profile/models/user_model.dart';
 import 'package:velvet/features/splash/controllers/splash_controller.dart';
 import 'package:velvet/routes/routes_name.dart';
 
+// ─────────────────────────────────────────────────────────
+//  AuthController
+// ─────────────────────────────────────────────────────────
 class AuthController extends GetxController {
-  // ── Form Keys ──────────────────────────────────────────────────────────────
+  final AuthRepository repo;
+  AuthController({required this.repo});
+
+  // ── User State ─────────────────────────────────────────
+  final Rx<UserModel?> user = Rx<UserModel?>(null);
+  final RxBool isLoading = false.obs;
+  final RxString errorMessage = ''.obs;
+
+  bool get isLoggedIn => user.value != null;
+
+  // ── Form Keys ──────────────────────────────────────────
   final loginFormKey = GlobalKey<FormState>();
   final signupFormKey = GlobalKey<FormState>();
 
-  // ── Text Controllers ───────────────────────────────────────────────────────
+  // ── Text Controllers ───────────────────────────────────
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final nameController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  // ── Observable State ───────────────────────────────────────────────────────
-  final isLoading = false.obs;
+  // ── UI Toggles ─────────────────────────────────────────
   final isPasswordVisible = false.obs;
   final isConfirmPasswordVisible = false.obs;
   final rememberMe = false.obs;
 
-  // ── Toggles ────────────────────────────────────────────────────────────────
   void togglePasswordVisibility() =>
       isPasswordVisible.value = !isPasswordVisible.value;
   void toggleConfirmPasswordVisibility() =>
       isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
   void toggleRememberMe(bool? val) => rememberMe.value = val ?? false;
 
-  // ── Validators ─────────────────────────────────────────────────────────────
+  // ── Validators ─────────────────────────────────────────
   String? validateEmail(String? val) {
     if (val == null || val.trim().isEmpty) return 'Email is required';
     if (!GetUtils.isEmail(val.trim())) return 'Enter a valid email';
@@ -52,35 +65,64 @@ class AuthController extends GetxController {
     return null;
   }
 
-  // ── Auth Actions ───────────────────────────────────────────────────────────
+  // ── Lifecycle ──────────────────────────────────────────
+  @override
+  void onInit() {
+    super.onInit();
+    user.value = UserModel.dummy; // TODO: remove when real auth is ready
+  }
+
+  // ── Login ──────────────────────────────────────────────
   Future<void> login() async {
     if (!loginFormKey.currentState!.validate()) return;
-    isLoading.value = true;
-    await Future.delayed(
-      const Duration(seconds: 2),
-    ); // TODO: replace with repository call
-    SplashController.saveToken('127347162374672137467127');
-    isLoading.value = false;
-    Get.offAllNamed(RoutesName.home);
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+      final result = await repo.login(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+      user.value = result;
+      _clearFields();
+      Get.offAllNamed(RoutesName.home);
+    } catch (e) {
+      errorMessage.value = 'Invalid email or password';
+    } finally {
+      isLoading.value = false;
+    }
   }
 
+  // ── Register ───────────────────────────────────────────
+  // ── Signup ─────────────────────────────────────────────
   Future<void> signup() async {
     if (!signupFormKey.currentState!.validate()) return;
-    isLoading.value = true;
-    await Future.delayed(
-      const Duration(seconds: 2),
-    ); // TODO: replace with repository call
-    isLoading.value = false;
-    Get.offAllNamed(RoutesName.home);
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+      final result = await repo.register(
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+      user.value = result;
+      _clearFields();
+      Get.offAllNamed(RoutesName.home);
+    } catch (e) {
+      errorMessage.value = 'Registration failed. Please try again.';
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void logout() {
-    _clear();
-    Get.offAllNamed(RoutesName.login);
+  // ── Logout ─────────────────────────────────────────────
+  Future<void> logout() async {
+    await repo.logout();
+    SplashController.clearToken();
+    Get.toNamed(RoutesName.login);
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  void _clear() {
+  // ── Helpers ────────────────────────────────────────────
+  void _clearFields() {
     emailController.clear();
     passwordController.clear();
     nameController.clear();

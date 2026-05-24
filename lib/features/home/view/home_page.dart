@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:velvet/core/constants/app_strings.dart';
 import 'package:velvet/core/theme/app_pallete.dart';
 import 'package:velvet/core/theme/app_text_style.dart';
 import 'package:velvet/core/widgets/custom_bottom_nav_bar.dart';
 import 'package:velvet/features/home/controllers/home_controller.dart';
-import 'package:velvet/features/home/view/cart_page.dart';
-import 'package:velvet/features/home/view/profile_page.dart';
-import 'package:velvet/features/home/view/wishlist_page.dart';
+import 'package:velvet/features/cart/view/cart_page.dart';
+import 'package:velvet/features/profile/view/profile_page.dart';
+import 'package:velvet/features/wishlist/view/wishlist_page.dart';
 import 'package:velvet/features/home/widgets/filter_bottom_sheet.dart';
 import 'package:velvet/features/home/widgets/home_app_bar.dart';
 import 'package:velvet/features/home/widgets/home_banner_slider.dart';
@@ -96,27 +95,6 @@ class _HomeBody extends StatelessWidget {
         // Categories
         const SliverToBoxAdapter(child: HomeCategoryChips()),
         const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
-        // Popular products header
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(AppStrings.homePopular, style: AppTextStyle.s16w6()),
-                GestureDetector(
-                  onTap: _showFilter,
-                  child: Text(
-                    'See All',
-                    style: AppTextStyle.s14w4(color: AppPallete.primary),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
         // Product list — single column, full width cards
         Obx(() {

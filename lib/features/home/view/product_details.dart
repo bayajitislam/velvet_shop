@@ -3,19 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:velvet/core/theme/app_pallete.dart';
 import 'package:velvet/core/theme/app_text_style.dart';
+import 'package:velvet/features/cart/controllers/cart_controller.dart';
+import 'package:velvet/features/cart/models/cart_item_model.dart';
 import 'package:velvet/features/home/models/product_model.dart';
 import 'package:velvet/features/home/widgets/products/image_gallery.dart';
 import 'package:velvet/features/home/widgets/products/quantity_counter.dart';
 import 'package:velvet/features/home/widgets/products/size_guide_sheet.dart';
 import 'package:velvet/features/home/widgets/products/size_selector.dart';
+import 'package:velvet/features/wishlist/controllers/wishlist_controller.dart';
 import 'package:velvet/routes/routes_name.dart';
-
-// ─────────────────────────────────────────────────────────
-//  ProductDetailPage — with cart-drop animation
-//
-//  The flying mini image uses Flutter's Overlay system
-//  so it can fly over the AppBar + everything else.
-// ─────────────────────────────────────────────────────────
 
 enum _CartBtnState { idle, flying, added }
 
@@ -29,6 +25,10 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage>
     with TickerProviderStateMixin {
   late final ProductModel _product;
+
+  // ── Controllers (lazy — safe after initState) ────────
+  CartController get _cart => Get.find<CartController>();
+  WishlistController get _wishlist => Get.find<WishlistController>();
 
   int _currentImage = 0;
   String _selectedSize = 'M';
@@ -68,7 +68,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   late final Animation<double> _flyOpacity;
   OverlayEntry? _flyOverlay;
 
-  // Keys for position calculation
   final GlobalKey _addToCartBtnKey = GlobalKey();
   final GlobalKey _buyNowBtnKey = GlobalKey();
 
@@ -91,37 +90,50 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
     _product = Get.arguments as ProductModel;
 
-    // Enter
+    //  Seed heart icon from WishlistController — stays in sync across pages
+    _isFavorite = _wishlist.isWishlisted(_product.id);
+
+    // ── Enter ──────────────────────────────────────────
     _enterCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
     _contentSlide = Tween<Offset>(
       begin: const Offset(0, 0.12),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _enterCtrl, curve: Curves.easeOutCubic));
     _contentFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: _enterCtrl,
-          curve: const Interval(0.0, 0.7, curve: Curves.easeIn)),
+        parent: _enterCtrl,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeIn),
+      ),
     );
 
-    // Favorite
+    // ── Favorite bounce ────────────────────────────────
     _favCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 350));
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
     _favScale = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.35), weight: 40),
       TweenSequenceItem(tween: Tween(begin: 1.35, end: 0.90), weight: 30),
       TweenSequenceItem(tween: Tween(begin: 0.90, end: 1.0), weight: 30),
     ]).animate(CurvedAnimation(parent: _favCtrl, curve: Curves.easeOut));
 
-    // Button text fade
+    // ── Button text fade ───────────────────────────────
     _btnTextCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 180));
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
     _btnTextFade = Tween<double>(begin: 1.0, end: 0.0).animate(
-        CurvedAnimation(parent: _btnTextCtrl, curve: Curves.easeIn));
+      CurvedAnimation(parent: _btnTextCtrl, curve: Curves.easeIn),
+    );
 
-    // Shake
+    // ── Shake ──────────────────────────────────────────
     _shakeCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 400));
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
     _shakeOffset = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: -7.0), weight: 15),
       TweenSequenceItem(tween: Tween(begin: -7.0, end: 7.0), weight: 20),
@@ -130,23 +142,29 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       TweenSequenceItem(tween: Tween(begin: 5.0, end: 0.0), weight: 25),
     ]).animate(CurvedAnimation(parent: _shakeCtrl, curve: Curves.easeInOut));
 
-    // Added fade
+    // ── Added fade ─────────────────────────────────────
     _addedCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     _addedFade = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _addedCtrl, curve: Curves.easeOut));
+      CurvedAnimation(parent: _addedCtrl, curve: Curves.easeOut),
+    );
 
-    // Flying arc
+    // ── Flying arc ─────────────────────────────────────
     _flyCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 750));
-    _flyProgress =
-        CurvedAnimation(parent: _flyCtrl, curve: Curves.easeInOut);
+      vsync: this,
+      duration: const Duration(milliseconds: 750),
+    );
+    _flyProgress = CurvedAnimation(parent: _flyCtrl, curve: Curves.easeInOut);
     _flyScale = Tween<double>(begin: 1.0, end: 0.0).animate(
-        CurvedAnimation(parent: _flyCtrl, curve: Curves.easeIn));
+      CurvedAnimation(parent: _flyCtrl, curve: Curves.easeIn),
+    );
     _flyOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
-          parent: _flyCtrl,
-          curve: const Interval(0.70, 1.0, curve: Curves.easeIn)),
+        parent: _flyCtrl,
+        curve: const Interval(0.70, 1.0, curve: Curves.easeIn),
+      ),
     );
 
     _scrollController.addListener(_onScroll);
@@ -156,8 +174,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   void _onScroll() {
     final offset = _scrollController.offset;
     setState(() => _parallaxOffset = offset * 0.40);
-    final opacity =
-        ((offset - (_imageHeight - 60)) / 70).clamp(0.0, 1.0);
+    final opacity = ((offset - (_imageHeight - 60)) / 70).clamp(0.0, 1.0);
     if (opacity != _appBarTitleOpacity) {
       setState(() => _appBarTitleOpacity = opacity);
     }
@@ -181,7 +198,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   Offset _arcPosition(Offset start, Offset end, double t) {
     final ctrl = Offset(
       (start.dx + end.dx) / 2,
-      start.dy - 160, // arc apex height
+      start.dy - 160,
     );
     final mt = 1 - t;
     return Offset(
@@ -190,7 +207,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  // ── Get global center of a widget ───────────────────
   Offset? _globalCenter(GlobalKey key) {
     final box = key.currentContext?.findRenderObject() as RenderBox?;
     if (box == null) return null;
@@ -198,7 +214,18 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     return pos + Offset(box.size.width / 2, box.size.height / 2);
   }
 
-  // ── Cart drop sequence ───────────────────────────────
+  // ── Build CartItemModel from current page state ──────
+  CartItemModel _buildCartItem() => CartItemModel.fromProduct(
+        productId: _product.id,
+        name: _product.name,
+        subtitle: _product.subtitle, // swap if your field is named differently
+        imageUrl: _product.images.first,
+        size: _selectedSize,
+        price: _product.price,
+        quantity: _quantity,
+      );
+
+  // ── Add to Cart — animation + actual cart call ───────
   Future<void> _handleAddToCart() async {
     if (_cartBtnState != _CartBtnState.idle) return;
 
@@ -206,14 +233,14 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     final end = _globalCenter(_buyNowBtnKey);
     if (start == null || end == null) return;
 
-    // Notify parent
-    // widget.onAddToCart(); // uncomment when wiring to controller
+    //  Add to CartController first
+    _cart.addItem(_buildCartItem());
 
     // 1. Fade out button text
     await _btnTextCtrl.forward();
     setState(() => _cartBtnState = _CartBtnState.flying);
 
-    // 2. Launch overlay flying widget
+    // 2. Launch flying overlay
     _flyCtrl.reset();
     _flyOverlay = OverlayEntry(
       builder: (_) => AnimatedBuilder(
@@ -262,7 +289,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     Overlay.of(context).insert(_flyOverlay!);
     await _flyCtrl.forward();
 
-    // 3. Remove overlay + shake cart icon
+    // 3. Remove overlay + shake Buy Now button
     _flyOverlay?.remove();
     _flyOverlay = null;
     _shakeCtrl.forward(from: 0);
@@ -279,8 +306,16 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     setState(() => _cartBtnState = _CartBtnState.idle);
   }
 
+  // ── Buy Now — add to cart silently then go to cart ───
+  void _handleBuyNow() {
+    _cart.addItem(_buildCartItem());
+    Get.toNamed(RoutesName.cart);
+  }
+
+  // ── Wishlist — delegates to WishlistController ───────
   void _toggleFavorite() {
-    setState(() => _isFavorite = !_isFavorite);
+    _wishlist.toggle(_product);
+    setState(() => _isFavorite = _wishlist.isWishlisted(_product.id));
     _favCtrl.forward(from: 0);
   }
 
@@ -298,7 +333,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     return Scaffold(
       backgroundColor: AppPallete.scaffold,
 
-      // ── AppBar ─────────────────────────────────────────
       appBar: AppBar(
         backgroundColor: AppPallete.scaffold,
         elevation: 0,
@@ -314,7 +348,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         title: AnimatedOpacity(
           duration: const Duration(milliseconds: 150),
           opacity: _appBarTitleOpacity,
-          child: Text('Product Details', style: AppTextStyle.s16w6()),
+          child: Text(
+            'Product Details',
+            style: AppTextStyle.s16w6().copyWith(color: AppPallete.bodyText),
+          ),
         ),
         actions: [
           Padding(
@@ -341,7 +378,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               // ── Parallax image ─────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: SizedBox(
@@ -360,6 +397,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                               onPageChanged: (i) =>
                                   setState(() => _currentImage = i),
                             ),
+                            
                           ),
                         ],
                       ),
@@ -386,20 +424,30 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(_product.name,
-                                        style: AppTextStyle.s24w7()),
+                                    Text(
+                                      _product.name,
+                                      style: AppTextStyle.s24w7(),
+                                    ),
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        const Icon(Icons.star_rounded,
-                                            color: AppPallete.star, size: 16),
+                                        const Icon(
+                                          Icons.star_rounded,
+                                          color: AppPallete.star,
+                                          size: 16,
+                                        ),
                                         const SizedBox(width: 4),
-                                        Text('${_product.rating}',
-                                            style: AppTextStyle.s12w5(
-                                                color: AppPallete.bodyText)),
+                                        Text(
+                                          '${_product.rating}',
+                                          style: AppTextStyle.s12w5(
+                                            color: AppPallete.bodyText,
+                                          ),
+                                        ),
                                         const SizedBox(width: 4),
-                                        Text('(${_product.reviewCount})',
-                                            style: AppTextStyle.s12w4()),
+                                        Text(
+                                          '(${_product.reviewCount})',
+                                          style: AppTextStyle.s12w4(),
+                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 12),
@@ -411,14 +459,16 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                                         Text(
                                           '\$${_product.price.toStringAsFixed(2)}',
                                           style: AppTextStyle.s24w7(
-                                              color: AppPallete.bodyText),
+                                            color: AppPallete.bodyText,
+                                          ),
                                         ),
                                         if (_product.originalPrice != null) ...[
                                           const SizedBox(width: 8),
                                           Text(
                                             '\$${_product.originalPrice!.toStringAsFixed(2)}',
                                             style: AppTextStyle.strikethrough(
-                                                fontSize: 15),
+                                              fontSize: 15,
+                                            ),
                                           ),
                                         ],
                                       ],
@@ -445,13 +495,15 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Size Guide',
-                                  style: AppTextStyle.s14w6()),
+                              Text('Size Guide', style: AppTextStyle.s14w6()),
                               GestureDetector(
                                 onTap: _showSizeGuide,
-                                child: Text('Guide →',
-                                    style: AppTextStyle.s12w5(
-                                        color: AppPallete.primary)),
+                                child: Text(
+                                  'Guide →',
+                                  style: AppTextStyle.s12w5(
+                                    color: AppPallete.primary,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -476,34 +528,46 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                             firstChild: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_product.description,
-                                    style: AppTextStyle.s12w4(
-                                        color: AppPallete.subTextColor),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis),
+                                Text(
+                                  _product.description,
+                                  style: AppTextStyle.s12w4(
+                                    color: AppPallete.subTextColor,
+                                  ),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () =>
                                       setState(() => _descExpanded = true),
-                                  child: Text('See more......',
-                                      style: AppTextStyle.s12w5(
-                                          color: AppPallete.bodyText)),
+                                  child: Text(
+                                    'See more......',
+                                    style: AppTextStyle.s12w5(
+                                      color: AppPallete.bodyText,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                             secondChild: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_product.description,
-                                    style: AppTextStyle.s12w4(
-                                        color: AppPallete.subTextColor)),
+                                Text(
+                                  _product.description,
+                                  style: AppTextStyle.s12w4(
+                                    color: AppPallete.subTextColor,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () =>
                                       setState(() => _descExpanded = false),
-                                  child: Text('See less',
-                                      style: AppTextStyle.s12w5(
-                                          color: AppPallete.bodyText)),
+                                  child: Text(
+                                    'See less',
+                                    style: AppTextStyle.s12w5(
+                                      color: AppPallete.bodyText,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -530,7 +594,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               addedFade: _addedFade,
               shakeOffset: _shakeOffset,
               onAddToCart: _handleAddToCart,
-              onBuyNow: () => Get.toNamed(RoutesName.checkout),
+              onBuyNow: _handleBuyNow,
             ),
           ),
         ],
@@ -540,7 +604,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 }
 
 // ─────────────────────────────────────────────────────────
-//  Bottom CTA bar widget
+//  Bottom CTA bar — unchanged
 // ─────────────────────────────────────────────────────────
 class _BottomCtaBar extends StatelessWidget {
   final GlobalKey addToCartKey;
@@ -582,7 +646,7 @@ class _BottomCtaBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Add to Cart
+          // ── Add to Cart ─────────────────────────────
           Expanded(
             child: SizedBox(
               key: addToCartKey,
@@ -602,11 +666,11 @@ class _BottomCtaBar extends StatelessWidget {
                       width: 1.5,
                     ),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                     elevation: 0,
                   ),
-                  child: _buildCartBtnContent(
-                      cartBtnState, btnTextFade, addedFade),
+                  child: _buildCartBtnContent(cartBtnState, btnTextFade, addedFade),
                 ),
               ),
             ),
@@ -614,7 +678,7 @@ class _BottomCtaBar extends StatelessWidget {
 
           const SizedBox(width: 12),
 
-          // Buy Now — with shake on cart drop land
+          // ── Buy Now ─────────────────────────────────
           Expanded(
             child: SizedBox(
               key: buyNowKey,
@@ -625,7 +689,8 @@ class _BottomCtaBar extends StatelessWidget {
                   backgroundColor: AppPallete.bodyText,
                   foregroundColor: AppPallete.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   elevation: 0,
                 ),
                 child: AnimatedBuilder(
@@ -637,8 +702,11 @@ class _BottomCtaBar extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.shopping_bag_outlined,
-                          size: 18, color: AppPallete.white),
+                      const Icon(
+                        Icons.shopping_bag_outlined,
+                        size: 18,
+                        color: AppPallete.white,
+                      ),
                       const SizedBox(width: 6),
                       Text('Buy Now', style: AppTextStyle.button()),
                     ],
@@ -662,18 +730,18 @@ class _BottomCtaBar extends StatelessWidget {
         return FadeTransition(
           key: const ValueKey('idle'),
           opacity: textFade,
-          child: Text('Add to Cart',
-              style: AppTextStyle.button(color: AppPallete.bodyText)),
+          child: Text(
+            'Add to Cart',
+            style: AppTextStyle.button(color: AppPallete.bodyText),
+          ),
         );
-
       case _CartBtnState.flying:
-        return Icon(
-          key: const ValueKey('flying'),
+        return const Icon(
+          key: ValueKey('flying'),
           Icons.shopping_bag_outlined,
           color: AppPallete.primary,
           size: 22,
         );
-
       case _CartBtnState.added:
         return FadeTransition(
           key: const ValueKey('added'),
@@ -681,11 +749,16 @@ class _BottomCtaBar extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle_rounded,
-                  color: AppPallete.primary, size: 18),
+              const Icon(
+                Icons.check_circle_rounded,
+                color: AppPallete.primary,
+                size: 18,
+              ),
               const SizedBox(width: 6),
-              Text('Added!',
-                  style: AppTextStyle.button(color: AppPallete.primary)),
+              Text(
+                'Added!',
+                style: AppTextStyle.button(color: AppPallete.primary),
+              ),
             ],
           ),
         );
@@ -694,7 +767,7 @@ class _BottomCtaBar extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────
-//  AppBar circle icon button
+//  AppBar circle icon button — unchanged
 // ─────────────────────────────────────────────────────────
 class _AppBarIconBtn extends StatelessWidget {
   final IconData icon;
@@ -717,13 +790,6 @@ class _AppBarIconBtn extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppPallete.surface,
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.07),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Icon(icon, color: iconColor ?? AppPallete.bodyText, size: 20),
       ),

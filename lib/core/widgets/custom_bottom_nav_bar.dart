@@ -44,16 +44,12 @@ class CustomBottomNavBar extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: selected
-                          ? AppPallete.primary
-                          : Colors.transparent,
+                      color: selected ? AppPallete.primary : Colors.transparent,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _items[i].icon,
-                      color: selected
-                          ? AppPallete.white
-                          : AppPallete.extraAsh,
+                      color: selected ? AppPallete.white : AppPallete.extraAsh,
                       size: 22,
                     ),
                   ),

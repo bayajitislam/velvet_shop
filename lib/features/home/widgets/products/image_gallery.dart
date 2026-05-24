@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:velvet/core/theme/app_pallete.dart';
+import 'package:velvet/features/home/widgets/products/zomable_image.dart';
 
 // ─────────────────────────────────────────────────────────
 //  ImageGallery
@@ -48,38 +49,8 @@ class ImageGallery extends StatelessWidget {
                 tag: isFirst
                     ? 'product-image-${images[0]}'
                     : 'product-image-$i',
-                child: Image.network(
-                  images[i],
-                  fit: BoxFit.cover,
-                  // KEY FIX: y=-0.3 → 30% above center
-                  // subject (face/torso) always visible
-                  alignment: const Alignment(0, -0.3),
-                  width: double.infinity,
-                  loadingBuilder: (_, child, progress) {
-                    if (progress == null) return child;
-                    return Container(
-                      color: AppPallete.background,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: progress.expectedTotalBytes != null
-                              ? progress.cumulativeBytesLoaded /
-                                  progress.expectedTotalBytes!
-                              : null,
-                          color: AppPallete.primary,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (_, __, ___) => Container(
-                    color: AppPallete.background,
-                    child: const Icon(
-                      Icons.image_not_supported_outlined,
-                      color: AppPallete.extraAsh,
-                      size: 48,
-                    ),
-                  ),
-                ),
+
+                child: ZoomableImage(imageUrl: images[i]),
               );
             },
           ),
@@ -114,7 +85,8 @@ class ImageGallery extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(
-                                active ? 0.22 : 0.10),
+                              active ? 0.22 : 0.10,
+                            ),
                             blurRadius: active ? 10 : 5,
                           ),
                         ],
@@ -137,16 +109,16 @@ class ImageGallery extends StatelessWidget {
 
           // ── Bottom gradient ────────────────────────────
           Positioned(
-            bottom: 0, left: 0, right: 0, height: 56,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 56,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.28),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.black.withOpacity(0.28), Colors.transparent],
                 ),
               ),
             ),

@@ -21,10 +21,10 @@ class HomeCategoryChips extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(AppStrings.homeCategories, style: AppTextStyle.s16w6()),
+                Text(AppStrings.homeCategories, style: AppTextStyle.s20w6()),
                 Text(
                   'See All',
-                  style: AppTextStyle.s14w4(color: AppPallete.primary),
+                  style: AppTextStyle.s14w4(color: AppPallete.black),
                 ),
               ],
             ),
@@ -71,7 +71,7 @@ class HomeCategoryChips extends StatelessWidget {
                       ),
                       child: Text(
                         c.categories[i],
-                        style: AppTextStyle.s12w5(
+                        style: AppTextStyle.s14w4(
                           color: selected
                               ? AppPallete.white
                               : AppPallete.subTextColor,
