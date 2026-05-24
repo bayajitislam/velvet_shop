@@ -7,10 +7,22 @@ class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({super.key});
 
   static const _items = [
-    (icon: Icons.home_rounded, label: 'Home'),
-    (icon: Icons.favorite_border_rounded, label: 'Wishlist'),
-    (icon: Icons.shopping_cart_outlined, label: 'Cart'),
-    (icon: Icons.person_outline_rounded, label: 'Profile'),
+    (icon: Icons.home_sharp, activeIcon: Icons.home_rounded, label: 'Home'),
+    (
+      icon: Icons.favorite_border_rounded,
+      activeIcon: Icons.favorite_rounded,
+      label: 'Wishlist',
+    ),
+    (
+      icon: Icons.shopping_cart_outlined,
+      activeIcon: Icons.shopping_cart_rounded,
+      label: 'Cart',
+    ),
+    (
+      icon: Icons.person_outline_rounded,
+      activeIcon: Icons.person_rounded,
+      label: 'Profile',
+    ),
   ];
 
   @override
@@ -18,7 +30,6 @@ class CustomBottomNavBar extends StatelessWidget {
     final c = Get.find<HomeController>();
     return Obx(
       () => Container(
-        height: 64,
         decoration: BoxDecoration(
           color: AppPallete.bodyText,
           borderRadius: BorderRadius.circular(32),
@@ -30,6 +41,8 @@ class CustomBottomNavBar extends StatelessWidget {
             ),
           ],
         ),
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 60),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: List.generate(_items.length, (i) {
@@ -42,13 +55,13 @@ class CustomBottomNavBar extends StatelessWidget {
                 child: Center(
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
-                      color: selected ? AppPallete.primary : Colors.transparent,
+                      color: AppPallete.white.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      _items[i].icon,
+                      selected ? _items[i].activeIcon : _items[i].icon,
                       color: selected ? AppPallete.white : AppPallete.extraAsh,
                       size: 22,
                     ),

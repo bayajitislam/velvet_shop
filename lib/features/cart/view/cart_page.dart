@@ -340,13 +340,18 @@ class _OrderSummary extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Checkout button
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: () => Get.toNamed(RoutesName.checkout),
-              child: Text('Proceed to Checkout', style: AppTextStyle.button()),
-            ),
+          PrimaryButton(
+            buttonName: 'Proceed to Checkout',
+            onPressed: () {
+              // For demo, just clear cart and show snackbar
+              controller.clearCart();
+              Get.snackbar(
+                'Checkout',
+                'Order placed successfully!',
+                backgroundColor: AppPallete.success,
+                colorText: AppPallete.white,
+              );
+            },
           ),
         ],
       ),

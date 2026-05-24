@@ -52,10 +52,10 @@ class WishlistPage extends StatelessWidget {
           child: GridView.builder(
             padding: const EdgeInsets.only(top: 8, bottom: 24),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 1,
               crossAxisSpacing: 14,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.62, // same ratio as home grid
+              childAspectRatio: 1, // same ratio as home grid
             ),
             itemCount: c.items.length,
             itemBuilder: (_, i) {
