@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:velvet/core/common/app_dialog.dart';
 import 'package:velvet/core/theme/app_pallete.dart';
 import 'package:velvet/core/theme/app_text_style.dart';
 import 'package:velvet/features/auth/controllers/auth_controller.dart';
@@ -114,7 +115,15 @@ class ProfilePage extends StatelessWidget {
                 _SettingsItem(
                   icon: Icons.info_outline_rounded,
                   label: 'About velvet.',
-                  onTap: () => Get.toNamed(RoutesName.about),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (_) => const AppDialog(
+                      type: DialogType.info,
+                      title: 'About velvet.',
+                      message:
+                          'Velvet is a demo e-commerce app built with Flutter.',
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -419,7 +428,7 @@ class _SettingsItem extends StatelessWidget {
                 color: AppPallete.background,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, size: 18, color: AppPallete.primary),
+              child: Icon(icon, size: 18, color: AppPallete.indigoNavy),
             ),
 
             const SizedBox(width: 14),
@@ -429,7 +438,12 @@ class _SettingsItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: AppTextStyle.s14w6()),
+                  Text(
+                    label,
+                    style: AppTextStyle.s14w6().copyWith(
+                      color: AppPallete.bodyText,
+                    ),
+                  ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
                     Text(

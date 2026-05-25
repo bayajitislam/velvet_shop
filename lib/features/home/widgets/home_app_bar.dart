@@ -59,7 +59,12 @@ class HomeAppBar extends StatelessWidget {
           ),
 
           // Notification
-          _AppBarIconBtn(icon: Icons.notifications_none_rounded, onTap: () {}),
+          _AppBarIconBtn(
+            icon: Icons.notifications_none_rounded,
+            onTap: () {
+              Get.toNamed(RoutesName.notifications);
+            },
+          ),
           const SizedBox(width: 10),
 
           // Cart

@@ -196,7 +196,7 @@ class _CartItemTile extends StatelessWidget {
                     ),
                     child: Text(
                       'Size: ${item.size}',
-                      style: AppTextStyle.s10w4(color: AppPallete.subTextColor),
+                      style: AppTextStyle.s10w4(color: AppPallete.bodyText),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -345,12 +345,7 @@ class _OrderSummary extends StatelessWidget {
             onPressed: () {
               // For demo, just clear cart and show snackbar
               controller.clearCart();
-              Get.snackbar(
-                'Checkout',
-                'Order placed successfully!',
-                backgroundColor: AppPallete.success,
-                colorText: AppPallete.white,
-              );
+              Get.toNamed(RoutesName.checkout);
             },
           ),
         ],

@@ -33,7 +33,7 @@ class AppDialog extends StatelessWidget {
         : AppPallete.accent;
 
     return Dialog(
-      backgroundColor: AppPallete.primary, // Uses your theme bg
+      backgroundColor: AppPallete.white, // Uses your theme bg
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),

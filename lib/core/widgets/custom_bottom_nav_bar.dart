@@ -51,7 +51,6 @@ class CustomBottomNavBar extends StatelessWidget {
               onTap: () => c.onNavItemTapped(i),
               behavior: HitTestBehavior.opaque,
               child: SizedBox(
-                width: 56,
                 child: Center(
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
