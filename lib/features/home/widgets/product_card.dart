@@ -87,7 +87,7 @@ class _ProductCardState extends State<ProductCard>
                     }
                     return const SizedBox.expand();
                   },
-                  errorBuilder: (_, __, ___) {
+                  errorBuilder: (_, _, _) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (mounted && !_imageLoaded) {
                         setState(() => _imageLoaded = true);
@@ -112,7 +112,7 @@ class _ProductCardState extends State<ProductCard>
                 Positioned.fill(
                   child: AnimatedBuilder(
                     animation: _shimmerAnim,
-                    builder: (_, __) {
+                    builder: (_, _) {
                       return Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(

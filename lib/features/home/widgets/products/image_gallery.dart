@@ -84,8 +84,8 @@ class ImageGallery extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(
-                              active ? 0.22 : 0.10,
+                            color: Colors.black.withValues(
+                              alpha: active ? 0.22 : 0.10,
                             ),
                             blurRadius: active ? 10 : 5,
                           ),
@@ -118,7 +118,10 @@ class ImageGallery extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [Colors.black.withOpacity(0.28), Colors.transparent],
+                  colors: [
+                    Colors.black.withValues(alpha: 0.28),
+                    Colors.transparent,
+                  ],
                 ),
               ),
             ),
@@ -139,7 +142,7 @@ class ImageGallery extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: i == currentIndex
                         ? AppPallete.white
-                        : AppPallete.white.withOpacity(0.45),
+                        : AppPallete.white.withValues(alpha: 0.45),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),

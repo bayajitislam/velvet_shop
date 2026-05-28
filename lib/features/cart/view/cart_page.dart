@@ -61,7 +61,7 @@ class CartPage extends StatelessWidget {
             ListView.separated(
               padding: EdgeInsets.fromLTRB(16, 8, 16, 260 + bottomPadding),
               itemCount: c.items.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (_, i) {
                 final item = c.items[i];
                 return _CartItemTile(
@@ -158,7 +158,7 @@ class _CartItemTile extends StatelessWidget {
                 height: 90,
                 fit: BoxFit.cover,
                 alignment: const Alignment(0, -0.3),
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (_, _, _) => Container(
                   width: 80,
                   height: 90,
                   color: AppPallete.background,

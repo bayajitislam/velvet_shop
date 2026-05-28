@@ -46,7 +46,7 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
   // ── Flying image arc ─────────────────────────────────
   late final AnimationController _flyCtrl;
   late final Animation<double> _flyProgress; // 0→1 along arc
-  late final Animation<double> _flyScale;    // shrinks as it lands
+  late final Animation<double> _flyScale; // shrinks as it lands
   late final Animation<double> _flyOpacity;
 
   // ── Cart icon shake ──────────────────────────────────
@@ -75,9 +75,10 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _textFade = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _textFadeCtrl, curve: Curves.easeIn),
-    );
+    _textFade = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _textFadeCtrl, curve: Curves.easeIn));
 
     // Flying arc — 700ms
     _flyCtrl = AnimationController(
@@ -85,9 +86,10 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
       duration: const Duration(milliseconds: 700),
     );
     _flyProgress = CurvedAnimation(parent: _flyCtrl, curve: Curves.easeInOut);
-    _flyScale = Tween<double>(begin: 1.0, end: 0.15).animate(
-      CurvedAnimation(parent: _flyCtrl, curve: Curves.easeIn),
-    );
+    _flyScale = Tween<double>(
+      begin: 1.0,
+      end: 0.15,
+    ).animate(CurvedAnimation(parent: _flyCtrl, curve: Curves.easeIn));
     _flyOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _flyCtrl,
@@ -113,9 +115,10 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _addedFade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _addedCtrl, curve: Curves.easeOut),
-    );
+    _addedFade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _addedCtrl, curve: Curves.easeOut));
   }
 
   @override
@@ -129,8 +132,7 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
 
   // ── Compute start/end positions for arc ─────────────
   void _computePositions() {
-    final btnBox =
-        _cartBtnKey.currentContext?.findRenderObject() as RenderBox?;
+    final btnBox = _cartBtnKey.currentContext?.findRenderObject() as RenderBox?;
     final iconBox =
         _cartIconKey.currentContext?.findRenderObject() as RenderBox?;
 
@@ -216,12 +218,10 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
           padding: EdgeInsets.fromLTRB(20, 14, 20, bottomPadding + 14),
           decoration: BoxDecoration(
             color: AppPallete.surface,
-            border: Border(
-              top: BorderSide(color: AppPallete.stroke, width: 1),
-            ),
+            border: Border(top: BorderSide(color: AppPallete.stroke, width: 1)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 16,
                 offset: const Offset(0, -4),
               ),
@@ -305,7 +305,7 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
         if (_showFlyWidget)
           AnimatedBuilder(
             animation: _flyCtrl,
-            builder: (_, __) {
+            builder: (_, _) {
               final pos = _arcPosition(_flyProgress.value);
               final scale = _flyScale.value;
               final opacity = _flyOpacity.value;
@@ -313,8 +313,12 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
               return Positioned(
                 // Convert global → local Stack position
                 left: pos.dx - 28 * scale,
-                top: pos.dy - 28 * scale - MediaQuery.of(context).size.height +
-                    MediaQuery.of(context).padding.bottom + 80,
+                top:
+                    pos.dy -
+                    28 * scale -
+                    MediaQuery.of(context).size.height +
+                    MediaQuery.of(context).padding.bottom +
+                    80,
                 child: Opacity(
                   opacity: opacity,
                   child: Transform.scale(
@@ -330,7 +334,7 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppPallete.primary.withOpacity(0.35),
+                            color: AppPallete.primary.withValues(alpha: 0.35),
                             blurRadius: 12,
                             spreadRadius: 2,
                           ),
@@ -384,8 +388,11 @@ class _ProductBottomCtaState extends State<ProductBottomCta>
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle_rounded,
-                  color: AppPallete.primary, size: 18),
+              Icon(
+                Icons.check_circle_rounded,
+                color: AppPallete.primary,
+                size: 18,
+              ),
               const SizedBox(width: 6),
               Text(
                 'Added!',

@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:velvet/features/auth/bindings/auth_binding.dart';
 import 'package:velvet/features/auth/view/login_page.dart';
 import 'package:velvet/features/auth/view/signup_page.dart';

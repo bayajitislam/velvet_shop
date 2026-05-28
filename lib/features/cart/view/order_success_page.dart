@@ -135,7 +135,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                     // Ripple ring
                     AnimatedBuilder(
                       animation: _rippleCtrl,
-                      builder: (_, __) => Transform.scale(
+                      builder: (_, _) => Transform.scale(
                         scale: _rippleScale.value,
                         child: Opacity(
                           opacity: _rippleOpacity.value,

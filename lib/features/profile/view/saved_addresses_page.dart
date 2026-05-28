@@ -49,7 +49,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
       body: ListView.separated(
         padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding + 90),
         itemCount: _addresses.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (_, i) {
           final a = _addresses[i];
           final isDefault = i == _defaultIndex;

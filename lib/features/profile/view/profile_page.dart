@@ -502,7 +502,7 @@ class _ToggleTrailingState extends State<_ToggleTrailing> {
       child: Switch(
         value: _value,
         onChanged: (v) => setState(() => _value = v),
-        activeColor: AppPallete.primary,
+        activeThumbColor: AppPallete.primary,
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );

@@ -125,9 +125,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       vsync: this,
       duration: const Duration(milliseconds: 180),
     );
-    _btnTextFade = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _btnTextCtrl, curve: Curves.easeIn),
-    );
+    _btnTextFade = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _btnTextCtrl, curve: Curves.easeIn));
 
     // ── Shake ──────────────────────────────────────────
     _shakeCtrl = AnimationController(
@@ -147,9 +148,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _addedFade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _addedCtrl, curve: Curves.easeOut),
-    );
+    _addedFade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _addedCtrl, curve: Curves.easeOut));
 
     // ── Flying arc ─────────────────────────────────────
     _flyCtrl = AnimationController(
@@ -157,9 +159,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       duration: const Duration(milliseconds: 750),
     );
     _flyProgress = CurvedAnimation(parent: _flyCtrl, curve: Curves.easeInOut);
-    _flyScale = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _flyCtrl, curve: Curves.easeIn),
-    );
+    _flyScale = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _flyCtrl, curve: Curves.easeIn));
     _flyOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _flyCtrl,
@@ -196,10 +199,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   // ── Arc math (quadratic bezier) ──────────────────────
   Offset _arcPosition(Offset start, Offset end, double t) {
-    final ctrl = Offset(
-      (start.dx + end.dx) / 2,
-      start.dy - 160,
-    );
+    final ctrl = Offset((start.dx + end.dx) / 2, start.dy - 160);
     final mt = 1 - t;
     return Offset(
       mt * mt * start.dx + 2 * mt * t * ctrl.dx + t * t * end.dx,
@@ -216,14 +216,14 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   // ── Build CartItemModel from current page state ──────
   CartItemModel _buildCartItem() => CartItemModel.fromProduct(
-        productId: _product.id,
-        name: _product.name,
-        subtitle: _product.subtitle, // swap if your field is named differently
-        imageUrl: _product.images.first,
-        size: _selectedSize,
-        price: _product.price,
-        quantity: _quantity,
-      );
+    productId: _product.id,
+    name: _product.name,
+    subtitle: _product.subtitle, // swap if your field is named differently
+    imageUrl: _product.images.first,
+    size: _selectedSize,
+    price: _product.price,
+    quantity: _quantity,
+  );
 
   // ── Add to Cart — animation + actual cart call ───────
   Future<void> _handleAddToCart() async {
@@ -245,7 +245,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     _flyOverlay = OverlayEntry(
       builder: (_) => AnimatedBuilder(
         animation: _flyCtrl,
-        builder: (_, __) {
+        builder: (_, _) {
           final pos = _arcPosition(start, end, _flyProgress.value);
           final scale = _flyScale.value.clamp(0.0, 1.0);
           final opacity = _flyOpacity.value.clamp(0.0, 1.0);
@@ -267,7 +267,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppPallete.primary.withOpacity(0.4 * opacity),
+                      color: AppPallete.primary.withValues(
+                        alpha: 0.4 * opacity,
+                      ),
                       blurRadius: 16,
                       spreadRadius: 2,
                     ),
@@ -360,8 +362,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               scale: _favScale,
               child: _AppBarIconBtn(
                 icon: _isFavorite ? Icons.favorite : Icons.favorite_border,
-                iconColor:
-                    _isFavorite ? AppPallete.primary : AppPallete.bodyText,
+                iconColor: _isFavorite
+                    ? AppPallete.primary
+                    : AppPallete.bodyText,
                 onTap: _toggleFavorite,
               ),
             ),
@@ -397,7 +400,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                               onPageChanged: (i) =>
                                   setState(() => _currentImage = i),
                             ),
-                            
                           ),
                         ],
                       ),
@@ -481,8 +483,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                                 quantity: _quantity,
                                 onIncrement: () => setState(() => _quantity++),
                                 onDecrement: () {
-                                  if (_quantity > 1)
+                                  if (_quantity > 1) {
                                     setState(() => _quantity--);
+                                  }
                                 },
                               ),
                             ],
@@ -638,7 +641,7 @@ class _BottomCtaBar extends StatelessWidget {
         border: Border(top: BorderSide(color: AppPallete.stroke, width: 1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, -4),
           ),
@@ -657,7 +660,7 @@ class _BottomCtaBar extends StatelessWidget {
                   onPressed: onAddToCart,
                   style: OutlinedButton.styleFrom(
                     backgroundColor: cartBtnState == _CartBtnState.added
-                        ? AppPallete.primary.withOpacity(0.06)
+                        ? AppPallete.primary.withValues(alpha: 0.06)
                         : AppPallete.surface,
                     side: BorderSide(
                       color: cartBtnState == _CartBtnState.added
@@ -670,7 +673,11 @@ class _BottomCtaBar extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  child: _buildCartBtnContent(cartBtnState, btnTextFade, addedFade),
+                  child: _buildCartBtnContent(
+                    cartBtnState,
+                    btnTextFade,
+                    addedFade,
+                  ),
                 ),
               ),
             ),
