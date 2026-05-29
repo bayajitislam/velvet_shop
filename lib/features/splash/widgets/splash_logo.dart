@@ -15,7 +15,7 @@ class SplashLogo extends StatelessWidget {
           width: 110,
           height: 110,
           decoration: BoxDecoration(
-            color: AppPallete.white,
+            color: AppPallete.transparent,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
@@ -30,13 +30,7 @@ class SplashLogo extends StatelessWidget {
             child: Stack(
               children: [
                 // Icon
-                Center(
-                  child: Icon(
-                    Icons.shopping_bag_rounded,
-                    size: 52,
-                    color: AppPallete.primary,
-                  ),
-                ),
+                Center(child: Image.asset('assets/playstore.png')),
 
                 // Shimmer sweep
                 Positioned.fill(
